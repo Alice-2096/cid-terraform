@@ -122,7 +122,7 @@ resource "aws_iam_policy" "ecs_chargeback_policy" {
 }
 
 resource "aws_iam_policy" "rds_utilization_policy" {
-  count = var.include_rds_utilization_module == "yes" ? 1 : 0
+  count = var.include_rds_utilization_module ? 1 : 0
 
   name        = "RDSUtilizationPolicy"
   description = "Policy for RDS Utilization data collection"
@@ -141,7 +141,7 @@ resource "aws_iam_policy" "rds_utilization_policy" {
 }
 
 resource "aws_iam_policy" "transit_gateway_policy" {
-  count = var.include_transit_gateway_module == "yes" ? 1 : 0
+  count = var.include_transit_gateway_module ? 1 : 0
 
   name        = "TransitGatewayPolicy"
   description = "Policy for Transit Gateway data collection"
@@ -161,37 +161,37 @@ resource "aws_iam_policy" "transit_gateway_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "ta_policy_attachment" {
-  count      = var.include_ta_module == "yes" ? 1 : 0
+  count      = var.include_ta_module ? 1 : 0
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.ta_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "budgets_read_only_policy_attachment" {
-  count      = var.include_budgets_module == "yes" ? 1 : 0
+  count      = var.include_budgets_module ? 1 : 0
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.budgets_read_only_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "inventory_collector_policy_attachment" {
-  count      = var.include_inventory_collector_module == "yes" ? 1 : 0
+  count      = var.include_inventory_collector_module ? 1 : 0
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.inventory_collector_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_chargeback_policy_attachment" {
-  count      = var.include_ecs_chargeback_module == "yes" ? 1 : 0
+  count      = var.include_ecs_chargeback_module ? 1 : 0
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.ecs_chargeback_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "rds_utilization_policy_attachment" {
-  count      = var.include_rds_utilization_module == "yes" ? 1 : 0
+  count      = var.include_rds_utilization_module ? 1 : 0
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.rds_utilization_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "transit_gateway_policy_attachment" {
-  count      = var.include_transit_gateway_module == "yes" ? 1 : 0
+  count      = var.include_transit_gateway_module ? 1 : 0
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.transit_gateway_policy[0].arn
 }

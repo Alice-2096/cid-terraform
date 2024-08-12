@@ -8,41 +8,41 @@ resource "aws_sfn_state_machine" "module_step_function" {
     "StartAt" = "HelloWorld",
     "States" = {
       "HelloWorld" = {
-        "Type" = "Pass",
+        "Type"   = "Pass",
         "Result" = "Hello, World!",
-        "End" = true
+        "End"    = true
       }
     }
   })
 
-#   definition_substitutions = jsonencode({
-#     AccountCollectorLambdaARN = var.account_collector_lambda_arn
-#     ModuleLambdaARN           = aws_lambda_function.lambda_function.arn
-#     Crawlers                  = ["${var.resource_prefix}${var.cid_data_name}-Crawler"]
-#     CollectionType            = "LINKED"
-#     Params                    = ''
-#     Module                    = var.cid_data_name
-#     DeployRegion              = data.aws_region.current.name
-#     Account                   = data.aws_caller_identity.current.account_id
-#     Prefix                    = var.resource_prefix
-#   })
-} 
+  #   definition_substitutions = jsonencode({
+  #     AccountCollectorLambdaARN = var.account_collector_lambda_arn
+  #     ModuleLambdaARN           = aws_lambda_function.lambda_function.arn
+  #     Crawlers                  = ["${var.resource_prefix}${var.cid_data_name}-Crawler"]
+  #     CollectionType            = "LINKED"
+  #     Params                    = ''
+  #     Module                    = var.cid_data_name
+  #     DeployRegion              = data.aws_region.current.name
+  #     Account                   = data.aws_caller_identity.current.account_id
+  #     Prefix                    = var.resource_prefix
+  #   })
+}
 
 resource "aws_scheduler_schedule" "module_refresh_schedule" {
-  name                  = "${var.resource_prefix}${var.cid_data_name}-RefreshSchedule"
-  description           = "Scheduler for the ODC ${var.cid_data_name} module"
-  schedule_expression   = var.schedule
-  state                 = "ENABLED"
+  name                = "${var.resource_prefix}${var.cid_data_name}-RefreshSchedule"
+  description         = "Scheduler for the ODC ${var.cid_data_name} module"
+  schedule_expression = var.schedule
+  state               = "ENABLED"
 
   flexible_time_window {
     maximum_window_in_minutes = 30
-    mode                     = "FLEXIBLE"
+    mode                      = "FLEXIBLE"
   }
 
   target {
-    arn     = aws_sfn_state_machine.module_step_function.arn
+    arn      = aws_sfn_state_machine.module_step_function.arn
     role_arn = var.scheduler_execution_role_arn
-    input   = jsonencode({
+    input = jsonencode({
       module_lambda = aws_lambda_function.lambda_function.arn
       crawlers      = ["${var.resource_prefix}${var.cid_data_name}-Crawler"]
     })

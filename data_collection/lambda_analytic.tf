@@ -20,18 +20,18 @@ resource "aws_iam_role" "lambda_analytics_role" {
 # Attach managed policy to the role
 resource "aws_iam_role_policy_attachment" "lambda_analytics_policy" {
   role       = aws_iam_role.lambda_analytics_role.name
-  policy_arn  = "arn:${data.aws_partition.partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  policy_arn = "arn:${data.aws_partition.partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 # Lambda function
 resource "aws_lambda_function" "lambda_analytics" {
   function_name = "${var.resource_prefix}analytics-Lambda"
-  description    = "Lambda function to collect general deployment metrics"
-  runtime        = "python3.10"
-  handler        = "index.lambda_handler"
-  memory_size    = 128
-  timeout        = 15
-  role           = aws_iam_role.lambda_analytics_role.arn
+  description   = "Lambda function to collect general deployment metrics"
+  runtime       = "python3.10"
+  handler       = "index.lambda_handler"
+  memory_size   = 128
+  timeout       = 15
+  role          = aws_iam_role.lambda_analytics_role.arn
 
   environment {
     variables = {

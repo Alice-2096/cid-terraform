@@ -1,1 +1,0 @@
-data_collection_account_id = "123456789012" # Replace with your data collection account ID

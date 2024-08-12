@@ -1,23 +1,23 @@
 provider "aws" {
-  region = "us-east-1" 
+  region = "us-east-1"
 }
 
 locals {
-  resource_prefix = "CID-DC-"  
+  resource_prefix = "CID-DC-"
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name               = "${local.resource_prefix}Optimization-Data-Multi-Account-Role"
+  name = "${local.resource_prefix}Optimization-Data-Multi-Account-Role"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2008-10-17",
     Statement = [{
-      Effect    = "Allow",
-      Action    = "sts:AssumeRole",
+      Effect = "Allow",
+      Action = "sts:AssumeRole",
       Principal = {
         AWS = "arn:aws:iam::${var.data_collection_account_id}:root"
       },
       Condition = {
-        ArnEquals = {
+        "ForAnyValue:ArnEquals" = {
           "aws:PrincipalArn" = [
             "arn:aws:iam::${var.data_collection_account_id}:role/${local.resource_prefix}budgets-LambdaRole",
             "arn:aws:iam::${var.data_collection_account_id}:role/${local.resource_prefix}ecs-chargeback-LambdaRole",
@@ -33,15 +33,15 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_policy" "ta_policy" {
-  count = var.include_ta_module == "yes" ? 1 : 0
+  count = var.include_ta_module ? 1 : 0
 
   name        = "TAPolicy"
   description = "Policy for Trusted Advisor data collection"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = [
+      Effect = "Allow",
+      Action = [
         "support:DescribeTrustedAdvisorChecks",
         "support:DescribeTrustedAdvisorCheckResult"
       ],
@@ -51,15 +51,15 @@ resource "aws_iam_policy" "ta_policy" {
 }
 
 resource "aws_iam_policy" "budgets_read_only_policy" {
-  count = var.include_budgets_module == "yes" ? 1 : 0
+  count = var.include_budgets_module ? 1 : 0
 
   name        = "BudgetsReadOnlyPolicy"
   description = "Policy for Budgets data collection"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = [
+      Effect = "Allow",
+      Action = [
         "budgets:ViewBudget",
         "budgets:DescribeBudgets",
         "budgets:ListTagsForResource"
@@ -70,15 +70,15 @@ resource "aws_iam_policy" "budgets_read_only_policy" {
 }
 
 resource "aws_iam_policy" "inventory_collector_policy" {
-  count = var.include_inventory_collector_module == "yes" ? 1 : 0
+  count = var.include_inventory_collector_module ? 1 : 0
 
   name        = "InventoryCollectorPolicy"
   description = "Policy for Inventory Collector data collection"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = [
+      Effect = "Allow",
+      Action = [
         "ec2:DescribeImages",
         "ec2:DescribeVolumes",
         "ec2:DescribeSnapshots",
@@ -102,15 +102,15 @@ resource "aws_iam_policy" "inventory_collector_policy" {
 }
 
 resource "aws_iam_policy" "ecs_chargeback_policy" {
-  count = var.include_ecs_chargeback_module == "yes" ? 1 : 0
+  count = var.include_ecs_chargeback_module ? 1 : 0
 
   name        = "ECSChargebackPolicy"
   description = "Policy for ECS Chargeback data collection"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = [
+      Effect = "Allow",
+      Action = [
         "ecs:ListServices",
         "ecs:DescribeServices",
         "ecs:ListClusters",
@@ -129,8 +129,8 @@ resource "aws_iam_policy" "rds_utilization_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = [
+      Effect = "Allow",
+      Action = [
         "rds:DescribeDBInstances",
         "ec2:DescribeRegions",
         "cloudwatch:GetMetricStatistics"
@@ -148,8 +148,8 @@ resource "aws_iam_policy" "transit_gateway_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect   = "Allow",
-      Action   = [
+      Effect = "Allow",
+      Action = [
         "ec2:DescribeTransitGatewayAttachments",
         "cloudwatch:Describe*",
         "cloudwatch:Get*",

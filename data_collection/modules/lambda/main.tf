@@ -1,6 +1,9 @@
+locals {
+  resource_prefix = "CID-DC-"
+}
 ################ LAMBDA ################
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.resource_prefix}${var.cid_data_name}-LambdaRole"
+  name = "${local.resource_prefix}${var.cid_data_name}-LambdaRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -25,8 +28,8 @@ resource "aws_iam_role" "lambda_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          Effect = "Allow"
-          Action = "sts:AssumeRole"
+          Effect   = "Allow"
+          Action   = "sts:AssumeRole"
           Resource = "arn:aws:iam::*:role/${var.multi_account_role_name}"
         }
       ]
@@ -52,11 +55,11 @@ resource "aws_iam_role" "lambda_role" {
 
 resource "aws_lambda_function" "lambda_function" {
   function_name = "${var.resource_prefix}${var.cid_data_name}-Lambda"
-  description    = "Lambda function to retrieve ${var.cid_data_name}"
-  runtime        = "python3.10"
-  memory_size    = 2688
-  timeout        = 300
-  role           = aws_iam_role.lambda_role.arn
+  description   = "Lambda function to retrieve ${var.cid_data_name}"
+  runtime       = "python3.10"
+  memory_size   = 2688
+  timeout       = 300
+  role          = aws_iam_role.lambda_role.arn
 
   environment {
     variables = {
@@ -71,15 +74,15 @@ resource "aws_lambda_function" "lambda_function" {
 
 resource "aws_logs_log_group" "log_group" {
   name              = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
-  retention_in_days  = 60
+  retention_in_days = 60
 }
 
 
 ################ CRAWLER ################
 resource "aws_glue_crawler" "crawler" {
-  name             = "${var.resource_prefix}${var.cid_data_name}-Crawler"
-  role             = var.glue_role_arn
-  database_name    = var.database_name
+  name          = "${var.resource_prefix}${var.cid_data_name}-Crawler"
+  role          = var.glue_role_arn
+  database_name = var.database_name
 
   s3_target {
     path = "s3://${var.destination_bucket}/${var.cid_data_name}/${var.cid_data_name}-data/"

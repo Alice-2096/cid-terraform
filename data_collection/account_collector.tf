@@ -1,13 +1,6 @@
-data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
-
-variable "management_account_id" {
-  description = "List of Payer IDs you wish to collect data for."
-  type        = string
-}
-
+##################################### Lambda account collector ############################################
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.resource_prefix}account-collector-LambdaRole"
+  name = "CID-DC-account-collector-LambdaRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -67,7 +60,7 @@ resource "aws_iam_role" "lambda_role" {
         {
           Effect   = "Allow"
           Action   = "ssm:GetParameter"
-          Resource = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/cid/${var.resource_prefix}*"
+          Resource = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/cid/${local.resource_prefix}*"
         }
       ]
     })
@@ -98,7 +91,7 @@ resource "aws_iam_role" "lambda_role" {
             "s3:GetObject",
             "s3:PutObject"
           ]
-          Resource = "cid-data-${data.aws_caller_identity.current.account_id}/*"
+          Resource = "arn:aws:s3:::cid-data-${data.aws_caller_identity.current.account_id}/*"
         }
       ]
     })
@@ -117,7 +110,7 @@ resource "aws_lambda_function" "account_collector" {
   description   = "Lambda function to retrieve the account list"
   runtime       = "python3.10"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "index.lambda_handler"
+  handler       = "account_collector.lambda_handler"
   memory_size   = 2688
   timeout       = 600
 
@@ -143,3 +136,5 @@ output "lambda_function_name" {
 output "lambda_function_arn" {
   value = aws_lambda_function.account_collector.arn
 }
+
+

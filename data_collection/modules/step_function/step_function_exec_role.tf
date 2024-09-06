@@ -1,6 +1,6 @@
 # IAM Role for Step Function Execution
 resource "aws_iam_role" "step_function_execution_role" {
-  name = "${var.resource_prefix}StepFunctionExecutionRole"
+  name = "${local.resource_prefix}StepFunctionExecutionRole"
   path = "/"
 
   assume_role_policy = jsonencode({
@@ -19,8 +19,8 @@ resource "aws_iam_role" "step_function_execution_role" {
 
 # Policy for Glue Execution
 resource "aws_iam_role_policy" "glue_execution_policy" {
-  name   = "GlueExecution"
-  role   = aws_iam_role.step_function_execution_role.id
+  name = "GlueExecution"
+  role = aws_iam_role.step_function_execution_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "glue_execution_policy" {
           "glue:StartCrawler",
           "glue:GetCrawler"
         ]
-        Resource = "arn:aws:glue:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:crawler/${var.resource_prefix}*Crawler*"
+        Resource = "arn:aws:glue:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:crawler/${local.resource_prefix}*Crawler*"
       }
     ]
   })
@@ -38,15 +38,15 @@ resource "aws_iam_role_policy" "glue_execution_policy" {
 
 # Policy for Lambda Invocation
 resource "aws_iam_role_policy" "invoke_collection_lambda_policy" {
-  name   = "InvokeCollectionLambda"
-  role   = aws_iam_role.step_function_execution_role.id
+  name = "InvokeCollectionLambda"
+  role = aws_iam_role.step_function_execution_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "lambda:InvokeFunction"
-        Resource = "arn:aws:lambda:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:function:${var.resource_prefix}*Lambda*"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
+        Resource = "arn:aws:lambda:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:function:${local.resource_prefix}*Lambda*"
       }
     ]
   })
@@ -54,8 +54,8 @@ resource "aws_iam_role_policy" "invoke_collection_lambda_policy" {
 
 # Policy for Synchronous Execution
 resource "aws_iam_role_policy" "synchronous_execution_policy" {
-  name   = "PolicyForSyncronousExecution"
-  role   = aws_iam_role.step_function_execution_role.id
+  name = "PolicyForSyncronousExecution"
+  role = aws_iam_role.step_function_execution_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -69,9 +69,9 @@ resource "aws_iam_role_policy" "synchronous_execution_policy" {
         Resource = "arn:aws:events:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
       },
       {
-        Effect = "Allow"
-        Action = "states:StartExecution"
-        Resource = "arn:aws:states:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${var.resource_prefix}*-StateMachine"
+        Effect   = "Allow"
+        Action   = "states:StartExecution"
+        Resource = "arn:aws:states:${data.aws_region.region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.resource_prefix}*-StateMachine"
       },
       {
         Effect = "Allow"
@@ -90,33 +90,20 @@ resource "aws_iam_role_policy" "synchronous_execution_policy" {
 
 # Policy for S3 Read Only Access
 resource "aws_iam_role_policy" "s3_read_only_access_policy" {
-  name   = "S3-ReadOnlyAccess"
-  role   = aws_iam_role.step_function_execution_role.id
+  name = "S3-ReadOnlyAccess"
+  role = aws_iam_role.step_function_execution_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "s3:GetObject"
-        Resource = "${aws_s3_bucket.s3_bucket.arn}/*"
+        Effect   = "Allow"
+        Action   = "s3:GetObject"
+        Resource = "${var.bucket_arn}/*"
       }
     ]
   })
 }
 
-# Data source for AWS region
-data "aws_region" "region" {}
-
-# Data source for AWS caller identity
-data "aws_caller_identity" "current" {}
-
-# Example S3 Bucket resource
-resource "aws_s3_bucket" "s3_bucket" {
-  bucket = "example-bucket"  # Replace with your bucket name
-}
-
-# Variables definition
-variable "resource_prefix" {
-  description = "Prefix for naming resources"
-  type        = string
+variable "bucket_arn" {
+  type = string
 }

@@ -1,3 +1,5 @@
+
+############################################ S3 Bucket ############################################
 resource "aws_s3_bucket" "cid_s3_bucket" {
   bucket = "cid-data-${data.aws_caller_identity.current.account_id}"
 }
@@ -57,5 +59,13 @@ resource "aws_s3_bucket_policy" "s3_data_bucket_policy" {
       }
     ]
   })
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.cid_s3_bucket.bucket
+}
+
+output "bucket_arn" {
+  value = aws_s3_bucket.cid_s3_bucket.arn
 }
 

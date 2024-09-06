@@ -1,3 +1,7 @@
+locals {
+  resource_prefix = "CID-DC-"
+}
+
 resource "aws_sfn_state_machine" "module_step_function" {
   name     = "${var.resource_prefix}${var.cid_data_name}-StateMachine"
   role_arn = var.step_function_execution_role_arn
@@ -29,7 +33,7 @@ resource "aws_sfn_state_machine" "module_step_function" {
 }
 
 resource "aws_scheduler_schedule" "module_refresh_schedule" {
-  name                = "${var.resource_prefix}${var.cid_data_name}-RefreshSchedule"
+  name                = "${local.resource_prefix}${var.cid_data_name}-RefreshSchedule"
   description         = "Scheduler for the ODC ${var.cid_data_name} module"
   schedule_expression = var.schedule
   state               = "ENABLED"
@@ -44,7 +48,7 @@ resource "aws_scheduler_schedule" "module_refresh_schedule" {
     role_arn = var.scheduler_execution_role_arn
     input = jsonencode({
       module_lambda = aws_lambda_function.lambda_function.arn
-      crawlers      = ["${var.resource_prefix}${var.cid_data_name}-Crawler"]
+      crawlers      = ["${local.resource_prefix}${var.cid_data_name}-Crawler"]
     })
   }
 }
@@ -74,11 +78,11 @@ resource "aws_lambda_function_event_invoke_config" "event_invoke_config" {
 }
 
 resource "aws_sns_topic" "success_topic" {
-  name = "${var.resource_prefix}${var.cid_data_name}-SuccessTopic"
+  name = "${local.resource_prefix}${var.cid_data_name}-SuccessTopic"
 }
 
 resource "aws_sns_topic" "failure_topic" {
-  name = "${var.resource_prefix}${var.cid_data_name}-FailureTopic"
+  name = "${local.resource_prefix}${var.cid_data_name}-FailureTopic"
 }
 
 resource "aws_sns_topic_subscription" "success_subscription" {
@@ -92,3 +96,10 @@ resource "aws_sns_topic_subscription" "failure_subscription" {
   protocol  = "lambda"
   endpoint  = aws_lambda_function.lambda_function.arn
 }
+
+variable "schedule" {
+  description = "EventBridge Schedule to trigger the data collection"
+  type        = string
+  default     = "rate(14 days)"
+}
+

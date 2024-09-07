@@ -85,7 +85,7 @@ resource "aws_cloudwatch_log_group" "log_group_budgets" {
 ##################### GLUE CRAWLER #####################
 resource "aws_glue_crawler" "crawler_budgets" {
   name          = "${local.resource_prefix}budgets-Crawler"
-  role          = "CID-DC-Glue-Crawler"
+  role          = aws_iam_role.glue_role.arn
   database_name = "optimization_data"
 
   s3_target {
@@ -97,7 +97,10 @@ resource "aws_glue_crawler" "crawler_budgets" {
 resource "aws_sfn_state_machine" "sfn_budgets" {
   name     = "CID-DC-budgets-StateMachine"
   role_arn = aws_iam_role.step_function_execution_role.arn
-  definition = templatefile("./definitions/budgets.asl.json", {
-    "account_id" = data.aws_caller_identity.current.account_id
+  definition = templatefile("./definitions/template.asl.json", {
+    "account_id"  = data.aws_caller_identity.current.account_id
+    "module_name" = "budgets"
+    "type"        = "LINKED"
+    "comment"     = "Orchestrate the collection of cost-anomaly data"
   })
 }

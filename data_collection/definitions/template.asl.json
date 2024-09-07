@@ -1,5 +1,5 @@
 {
-  "Comment": "Orchestrate the collection of budgets data",
+  "Comment": "${comment}",
   "StartAt": "AccountCollectorInvoke",
   "States": {
     "AccountCollectorInvoke": {
@@ -7,7 +7,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload": {
-          "Type": "LINKED"
+          "Type": "${type}"
         },
         "FunctionName": "arn:aws:lambda:us-east-1:${account_id}:function:CID-DC-account-collector-Lambda"
       },
@@ -45,7 +45,7 @@
                 "account.$": "$.account",
                 "params": ""
               },
-              "FunctionName": "arn:aws:lambda:us-east-1:${account_id}:function:CID-DC-budgets-Lambda"
+              "FunctionName": "arn:aws:lambda:us-east-1:${account_id}:function:CID-DC-${module_name}-Lambda"
             },
             "Retry": [
               {
@@ -83,7 +83,7 @@
       "Parameters": {
         "StateMachineArn": "arn:aws:states:us-east-1:${account_id}:stateMachine:CID-DC-CrawlerExecution-StateMachine",
         "Input": {
-          "crawlers": ["CID-DC-budgets-Crawler"]
+          "crawlers": ["CID-DC-${module_name}-Crawler"]
         }
       },
       "End": true

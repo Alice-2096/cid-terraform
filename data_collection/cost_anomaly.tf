@@ -89,3 +89,38 @@ resource "aws_cloudwatch_log_group" "log_group_cost_anomaly" {
   retention_in_days = 60
 }
 
+
+##################### GLUE CRAWLER #####################
+resource "aws_glue_crawler" "crawler_cost_anomaly" {
+  name          = "${local.resource_prefix}cost-anomaly-Crawler"
+  role          = aws_iam_role.glue_role.arn
+  database_name = "optimization_data"
+
+  s3_target {
+    path = "s3://cid-data-${data.aws_caller_identity.current.account_id}/cost-anomaly/cost-anomaly-data/"
+  }
+
+  configuration = jsonencode({
+    CrawlerOutput = {
+      Tables = {
+        TableThreshold = 1
+      }
+    }
+    Grouping = {
+      TableGroupingPolicy = "CombineCompatibleSchemas"
+    }
+    Version = 1.0
+  })
+}
+
+##################### STEP FUNCTION #####################
+resource "aws_sfn_state_machine" "sfn_cost_anomaly" {
+  name     = "CID-DC-cost-anomaly-StateMachine"
+  role_arn = aws_iam_role.step_function_execution_role.arn
+  definition = templatefile("./definitions/template.asl.json", {
+    "account_id"  = data.aws_caller_identity.current.account_id
+    "module_name" = "cost-anomaly"
+    "type"        = "Payers"
+    "comment"     = "Orchestrate the collection of cost-anomaly data"
+  })
+}

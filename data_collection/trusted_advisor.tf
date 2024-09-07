@@ -81,3 +81,32 @@ resource "aws_cloudwatch_log_group" "log_group_trusted_advisor" {
   retention_in_days = 60
 }
 
+##################### GLUE CRAWLER #####################
+resource "aws_glue_crawler" "crawler_trusted_advisor" {
+  name          = "${local.resource_prefix}trusted-advisor-Crawler"
+  role          = aws_iam_role.glue_role.arn
+  database_name = "optimization_data"
+
+  s3_target {
+    path = "s3://cid-data-${data.aws_caller_identity.current.account_id}/trusted-advisor/trusted-advisor-data/"
+  }
+
+  configuration = jsonencode({
+    Grouping = {
+      TableGroupingPolicy = "CombineCompatibleSchemas"
+    }
+    Version = 1.0
+  })
+}
+
+##################### STEP FUNCTION #####################
+resource "aws_sfn_state_machine" "sfn_trusted_advisor" {
+  name     = "CID-DC-trusted-advisor-StateMachine"
+  role_arn = aws_iam_role.step_function_execution_role.arn
+  definition = templatefile("./definitions/template.asl.json", {
+    "account_id"  = data.aws_caller_identity.current.account_id
+    "module_name" = "trusted-advisor"
+    "type"        = "LINKED"
+    "comment"     = "Orchestrate the collection of trusted-advisor data"
+  })
+}

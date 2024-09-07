@@ -7,7 +7,7 @@ locals {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "${local.resource_prefix}Lambda-Assume-Role-Management-Account"
+  name = "CID-DC-Lambda-Assume-Role-Management-Account"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [

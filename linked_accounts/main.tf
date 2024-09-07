@@ -61,7 +61,7 @@ resource "aws_iam_policy" "budgets_read_only_policy" {
       Effect = "Allow",
       Action = [
         "budgets:ViewBudget",
-        "budgets:DescribeBudgets",
+        "budgets:DescribeBudgetAction",
         "budgets:ListTagsForResource"
       ],
       Resource = "arn:aws:budgets::*:budget/*"

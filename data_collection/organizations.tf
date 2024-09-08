@@ -103,3 +103,20 @@ resource "aws_sfn_state_machine" "sfn_organizations" {
     "params"      = ""
   })
 }
+
+##################### SCHEDULER #####################
+
+
+##################### ATHENA VIEW #####################
+# resource "aws_athena_named_query" "cur_with_org_data" {
+#   name        = "${local.resource_prefix}view_cur_with_org_data"
+#   database    = "optimization_data"
+#   description = "Provides a CUR extended with organization info"
+#   query       = <<EOF
+# CREATE OR REPLACE VIEW cur_with_org_data AS
+# SELECT *
+# FROM (cid_cur.cur cur
+# INNER JOIN  "optimization_data"."organization_data"
+#   ON (cur.line_item_usage_account_id =  "optimization_data"."organization_data".id))
+# EOF
+# }

@@ -77,3 +77,22 @@ resource "aws_sfn_state_machine" "sfn_compute_optimizer" {
     "params"      = ""
   })
 }
+
+####################### SCHEDULER #####################
+resource "aws_scheduler_schedule" "schedule_compute_optimizer" {
+  description         = "Scheduler for the ODC compute-optimizer module"
+  name                = "${local.resource_prefix}compute-optimizer-RefreshSchedule"
+  group_name          = "default"
+  schedule_expression = "rate(14 days)"
+  state               = "ENABLED"
+
+  flexible_time_window {
+    mode                      = "FLEXIBLE"
+    maximum_window_in_minutes = 30
+  }
+
+  target {
+    arn      = aws_sfn_state_machine.sfn_compute_optimizer.arn
+    role_arn = aws_iam_role.scheduler_execution_role.arn
+  }
+}

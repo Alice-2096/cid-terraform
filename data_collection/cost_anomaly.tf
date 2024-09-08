@@ -125,3 +125,22 @@ resource "aws_sfn_state_machine" "sfn_cost_anomaly" {
     "params"      = ""
   })
 }
+
+####################### SCHEDULER #####################
+resource "aws_scheduler_schedule" "schedule_cost_anomaly" {
+  description         = "Scheduler for the ODC cost-anomaly module"
+  name                = "${local.resource_prefix}cost-anomaly-RefreshSchedule"
+  group_name          = "default"
+  schedule_expression = "rate(1 day)"
+  state               = "ENABLED"
+
+  flexible_time_window {
+    mode                      = "FLEXIBLE"
+    maximum_window_in_minutes = 30
+  }
+
+  target {
+    arn      = aws_sfn_state_machine.sfn_cost_anomaly.arn
+    role_arn = aws_iam_role.scheduler_execution_role.arn
+  }
+}

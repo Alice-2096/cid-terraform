@@ -135,3 +135,24 @@ resource "aws_sfn_state_machine" "sfn_inventory" {
     "params"      = "${each.value}"
   })
 }
+
+####################### SCHEDULER #####################
+resource "aws_scheduler_schedule" "schedule_inventory" {
+  for_each = local.inventory_map
+
+  description         = "Scheduler for the ODC inventory ${each.key} module"
+  name                = "${local.resource_prefix}inventory-${each.key}-RefreshSchedule"
+  group_name          = "default"
+  schedule_expression = "rate(14 days)"
+  state               = "ENABLED"
+
+  flexible_time_window {
+    mode                      = "FLEXIBLE"
+    maximum_window_in_minutes = 30
+  }
+
+  target {
+    arn      = aws_sfn_state_machine.sfn_inventory[each.key].arn
+    role_arn = aws_iam_role.scheduler_execution_role.arn
+  }
+}

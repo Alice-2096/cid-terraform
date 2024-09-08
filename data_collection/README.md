@@ -2,18 +2,18 @@
 
 | State Machine Name                                | Lambda | Crawler | Step Function | Scheduler |
 | ------------------------------------------------- | ------ | ------- | ------------- | --------- |
-| CID-DC-inventory-AMI-StateMachine                 | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-LambdaFunctions-StateMachine     | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-RdsDbInstances-StateMachine      | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-OpensearchDomains-StateMachine   | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-ElasticacheClusters-StateMachine | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-Snapshot-StateMachine            | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-RdsDbSnapshots-StateMachine      | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-Ec2Instances-StateMachine        | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-EKSClusters-StateMachine         | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-VpcInstances-StateMachine        | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-EBS-StateMachine                 | [x]    | [x]     | [ ]           | [ ]       |
-| CID-DC-inventory-RdsDbClusters-StateMachine       | [x]    | [x]     | [ ]           | [ ]       |
+| CID-DC-inventory-AMI-StateMachine                 | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-LambdaFunctions-StateMachine     | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-RdsDbInstances-StateMachine      | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-OpensearchDomains-StateMachine   | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-ElasticacheClusters-StateMachine | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-Snapshot-StateMachine            | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-RdsDbSnapshots-StateMachine      | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-Ec2Instances-StateMachine        | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-EKSClusters-StateMachine         | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-VpcInstances-StateMachine        | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-EBS-StateMachine                 | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-inventory-RdsDbClusters-StateMachine       | [x]    | [x]     | [x]           | [ ]       |
 | CID-DC-health-events-StateMachine                 | [ ]    | [ ]     | [ ]           | [ ]       |
 | CID-DC-health-events-detail-StateMachine          | [ ]    | [ ]     | [ ]           | [ ]       |
 | CID-DC-cost-anomaly-StateMachine                  | [x]    | [x]     | [x]           | [ ]       |

@@ -69,10 +69,11 @@ resource "aws_cloudwatch_log_group" "log_group_compute_optimizer" {
 resource "aws_sfn_state_machine" "sfn_compute_optimizer" {
   name     = "CID-DC-compute-optimizer-StateMachine"
   role_arn = aws_iam_role.step_function_execution_role.arn
-  definition = templatefile("./definitions/compute_optimizer.json", {
+  definition = templatefile("./definitions/template.asl.json", {
     "account_id"  = data.aws_caller_identity.current.account_id
     "module_name" = "compute-optimizer"
     "type"        = "Payers"
-    "comment"     = "Orchestrate the collection of compute-optimizer data"
+    "crawler"     = "CID-DC-compute-optimizer-Crawler"
+    "params"      = ""
   })
 }

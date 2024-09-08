@@ -107,6 +107,7 @@ resource "aws_sfn_state_machine" "sfn_trusted_advisor" {
     "account_id"  = data.aws_caller_identity.current.account_id
     "module_name" = "trusted-advisor"
     "type"        = "LINKED"
-    "comment"     = "Orchestrate the collection of trusted-advisor data"
+    "crawler"     = "CID-DC-trusted-advisor-Crawler"
+    "params"      = ""
   })
 }

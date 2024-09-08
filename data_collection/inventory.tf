@@ -83,18 +83,18 @@ resource "aws_cloudwatch_log_group" "log_group_inventory" {
 ##################### GLUE CRAWLER #####################
 locals {
   inventory_map = {
-    AMI                 = "inventory-ami-data/"
-    Ec2Instances        = "inventory-ec2-instances-data/"
-    ElasticacheClusters = "inventory-elasticache-clusters-data/"
-    LambdaFunctions     = "inventory-lambda-functions-data/"
-    OpensearchDomains   = "inventory-opensearch-domains-data/"
-    RdsDbClusters       = "inventory-rds-db-clusters-data/"
-    RdsDbInstances      = "inventory-rds-db-instances-data/"
-    RdsDbSnapshots      = "inventory-rds-db-snapshots-data/"
-    VpcInstances        = "inventory-vpc-data/"
-    EKSClusters         = "inventory-eks-data/"
-    EBS                 = "inventory-ebs-data/"
-    Snapshot            = "inventory-snapshot-data/"
+    AMI                 = "ami"
+    Ec2Instances        = "ec2-instances"
+    ElasticacheClusters = "elasticache-clusters"
+    LambdaFunctions     = "lambda-functions"
+    OpensearchDomains   = "opensearch-domains"
+    RdsDbClusters       = "rds-db-clusters"
+    RdsDbInstances      = "rds-db-instances"
+    RdsDbSnapshots      = "rds-db-snapshots"
+    VpcInstances        = "vpc"
+    EBS                 = "inventory"
+    EKSClusters         = "eks"
+    Snapshot            = "snapshot"
   }
 }
 
@@ -106,7 +106,7 @@ resource "aws_glue_crawler" "crawler_inventory" {
   database_name = "optimization_data"
 
   s3_target {
-    path = "s3://cid-data-${data.aws_caller_identity.current.account_id}/inventory/${each.value}"
+    path = "s3://cid-data-${data.aws_caller_identity.current.account_id}/inventory/inventory-${each.value}-data/"
   }
 
   configuration = jsonencode({
@@ -123,13 +123,15 @@ resource "aws_glue_crawler" "crawler_inventory" {
 }
 
 ##################### STEP FUNCTION #####################
-# resource "aws_sfn_state_machine" "sfn_inventory" {
-#   name     = "CID-DC-inventory-StateMachine"
-#   role_arn = aws_iam_role.step_function_execution_role.arn
-#   definition = templatefile("./definitions/template.asl.json", {
-#     "account_id"  = data.aws_caller_identity.current.account_id
-#     "module_name" = "inventory"
-#     "type"        = "Payers"
-#     "comment"     = "Orchestrate the collection of inventory data"
-#   })
-# }
+resource "aws_sfn_state_machine" "sfn_inventory" {
+  for_each = local.inventory_map
+  name     = "CID-DC-inventory-${each.key}-StateMachine"
+  role_arn = aws_iam_role.step_function_execution_role.arn
+  definition = templatefile("./definitions/template.asl.json", {
+    "account_id"  = data.aws_caller_identity.current.account_id
+    "module_name" = "inventory"
+    "type"        = "LINKED"
+    "crawler"     = "CID-DC-inventory-${each.key}-Crawler"
+    "params"      = "${each.value}"
+  })
+}

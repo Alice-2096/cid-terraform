@@ -121,6 +121,7 @@ resource "aws_sfn_state_machine" "sfn_cost_anomaly" {
     "account_id"  = data.aws_caller_identity.current.account_id
     "module_name" = "cost-anomaly"
     "type"        = "Payers"
-    "comment"     = "Orchestrate the collection of cost-anomaly data"
+    "crawler"     = "CID-DC-cost-anomaly-Crawler"
+    "params"      = ""
   })
 }

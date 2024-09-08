@@ -99,6 +99,7 @@ resource "aws_sfn_state_machine" "sfn_organizations" {
     "account_id"  = data.aws_caller_identity.current.account_id
     "module_name" = "organizations"
     "type"        = "Payers"
-    "comment"     = "Orchestrate the collection of organizations data"
+    "crawler"     = "CID-DC-organizations-Crawler"
+    "params"      = ""
   })
 }

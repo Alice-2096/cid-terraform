@@ -1,5 +1,5 @@
 {
-  "Comment": "${comment}",
+  "Comment": "Orchestrate the collection of ${module_name} data",
   "StartAt": "AccountCollectorInvoke",
   "States": {
     "AccountCollectorInvoke": {
@@ -43,7 +43,7 @@
             "Parameters": {
               "Payload": {
                 "account.$": "$.account",
-                "params": ""
+                "params": "${params}"
               },
               "FunctionName": "arn:aws:lambda:us-east-1:${account_id}:function:CID-DC-${module_name}-Lambda"
             },
@@ -83,7 +83,7 @@
       "Parameters": {
         "StateMachineArn": "arn:aws:states:us-east-1:${account_id}:stateMachine:CID-DC-CrawlerExecution-StateMachine",
         "Input": {
-          "crawlers": ["CID-DC-${module_name}-Crawler"]
+          "crawlers": ["${crawler}"]
         }
       },
       "End": true

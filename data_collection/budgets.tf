@@ -102,5 +102,7 @@ resource "aws_sfn_state_machine" "sfn_budgets" {
     "module_name" = "budgets"
     "type"        = "LINKED"
     "comment"     = "Orchestrate the collection of cost-anomaly data"
+    "crawler"     = "CID-DC-budgets-Crawler"
+    "params"      = ""
   })
 }

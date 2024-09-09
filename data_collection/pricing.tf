@@ -378,3 +378,53 @@ resource "aws_sfn_state_machine" "sfn_pricing_RegionNames" {
     "service"     = "RegionNames"
   })
 }
+
+##################### Schedulers ##################### 
+#TODO - Add scheduler for each crawler
+
+##################### GLUE TABLES #####################
+resource "aws_glue_catalog_table" "pricing" {
+  for_each      = local.ServicesMapPricing
+  depends_on    = [aws_glue_catalog_database.glue_database]
+  database_name = "optimization_data"
+  name          = "pricing_${each.value.path}_data"
+
+  table_type = "EXTERNAL_TABLE"
+  parameters = {
+    "classification"  = "csv"
+    "compressionType" = "none"
+  }
+
+  storage_descriptor {
+    number_of_buckets = -1
+    dynamic "columns" {
+      for_each = each.value.fields
+
+      content {
+        name = columns.value.Name
+        type = columns.value.Type
+      }
+    }
+    input_format  = "org.apache.hadoop.mapred.TextInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+    location      = "s3://cid-data-${data.aws_caller_identity.current.account_id}/pricing/pricing-${each.value.path}-data/"
+
+    ser_de_info {
+      serialization_library = "org.apache.hadoop.hive.serde2.OpenCSVSerde"
+      parameters = {
+        "separatorChar"        = ","
+        "quoteChar"            = "\""
+        "serialization.format" = "1"
+      }
+    }
+  }
+  dynamic "partition_keys" {
+    for_each = each.value.partition
+
+    content {
+      name = partition_keys.value.Name
+      type = partition_keys.value.Type
+    }
+  }
+
+}

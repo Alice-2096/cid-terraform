@@ -18,9 +18,9 @@
 | CID-DC-health-events-detail-StateMachine          | [ ]    | [ ]     | [ ]           | [ ]       |
 | CID-DC-cost-anomaly-StateMachine                  | [x]    | [x]     | [x]           | [x]       |
 | CID-DC-compute-optimizer-StateMachine             | [x]    | [x]     | [x]           | [x]       |
-| CID-DC-organizations-StateMachine                 | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-organizations-StateMachine                 | [x]    | [x]     | [x]           | [x]       |
 | CID-DC-budgets-StateMachine                       | [x]    | [x]     | [x]           | [x]       |
-| CID-DC-trusted-advisor-StateMachine               | [x]    | [x]     | [x]           | [ ]       |
+| CID-DC-trusted-advisor-StateMachine               | [x]    | [x]     | [x]           | [x]       |
 | CID-DC-pricing-AmazonES-StateMachine              | [x]    | [x]     | [x]           | [ ]       |
 | CID-DC-pricing-AWSLambda-StateMachine             | [x]    | [x]     | [x]           | [ ]       |
 | CID-DC-pricing-RegionNames-StateMachine           | [x]    | [x]     | [x]           | [ ]       |

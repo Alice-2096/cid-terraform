@@ -111,3 +111,22 @@ resource "aws_sfn_state_machine" "sfn_trusted_advisor" {
     "params"      = ""
   })
 }
+
+##################### SCHEDULER #####################
+resource "aws_scheduler_schedule" "schedule_trusted_advisor" {
+  description         = "Scheduler for the ODC trusted-advisor module"
+  name                = "${local.resource_prefix}trusted-advisor-RefreshSchedule"
+  group_name          = "default"
+  schedule_expression = "rate(14 days)"
+  state               = "ENABLED"
+
+  flexible_time_window {
+    mode                      = "FLEXIBLE"
+    maximum_window_in_minutes = 30
+  }
+
+  target {
+    arn      = aws_sfn_state_machine.sfn_trusted_advisor.arn
+    role_arn = aws_iam_role.scheduler_execution_role.arn
+  }
+}

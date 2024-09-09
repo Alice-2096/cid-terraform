@@ -125,29 +125,28 @@ resource "aws_scheduler_schedule" "schedule_budgets" {
   }
 }
 
-
 ####################### ATHENA VIEW #######################
-# resource "aws_athena_named_query" "athena_query" {
-#   name        = "${var.cf_data_name}_view"
-#   database    = aws_glue_catalog_database.example.name # Replace with your Glue database reference
-#   description = "Provides a summary view of ${var.cf_data_name}"
+resource "aws_athena_named_query" "athena_query_budgets" {
+  name        = "budgets_view"
+  database    = "optimization_data"
+  description = "Provides a summary view of ${local.resource_prefix}"
 
-#   query_string = <<EOF
-#     CREATE OR REPLACE VIEW budgets_view AS
-#     SELECT
-#       budgetname AS budget_name,
-#       CAST(budgetlimit.amount AS decimal) AS budget_amount,
-#       CAST(calculatedspend.actualspend.amount AS decimal) AS actualspend,
-#       CAST(calculatedspend.forecastedspend.amount AS decimal) AS forecastedspend,
-#       timeunit,
-#       budgettype AS budget_type,
-#       account_id,
-#       timeperiod.start AS start_date,
-#       timeperiod."end" AS end_date,
-#       year AS budget_year,
-#       month AS budget_month
-#     FROM
-#       ${aws_glue_catalog_database.example.name}.budgets_data
-#     WHERE (budgettype = 'COST') AND costfilters.filter[1] = 'None'
-#   EOF
-# }
+  query = <<EOF
+CREATE OR REPLACE VIEW budgets_view AS
+SELECT
+  budgetname AS budget_name,
+  CAST(budgetlimit.amount AS decimal) AS budget_amount,
+  CAST(calculatedspend.actualspend.amount AS decimal) AS actualspend,
+  CAST(calculatedspend.forecastedspend.amount AS decimal) AS forecastedspend,
+  timeunit,
+  budgettype AS budget_type,
+  account_id,
+  timeperiod.start AS start_date,
+  timeperiod."end" AS end_date,
+  year AS budget_year,
+  month AS budget_month
+FROM
+  optimization_data.budgets_data
+WHERE (budgettype = 'COST') AND costfilters.filter[1] = 'None'
+EOF
+}

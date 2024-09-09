@@ -105,18 +105,34 @@ resource "aws_sfn_state_machine" "sfn_organizations" {
 }
 
 ##################### SCHEDULER #####################
+resource "aws_scheduler_schedule" "schedule_organizations" {
+  description         = "Scheduler for the ODC organizations module"
+  name                = "${local.resource_prefix}organizations-RefreshSchedule"
+  group_name          = "default"
+  schedule_expression = "rate(14 days)"
+  state               = "ENABLED"
 
+  flexible_time_window {
+    mode                      = "FLEXIBLE"
+    maximum_window_in_minutes = 30
+  }
+
+  target {
+    arn      = aws_sfn_state_machine.sfn_organizations.arn
+    role_arn = aws_iam_role.scheduler_execution_role.arn
+  }
+}
 
 ##################### ATHENA VIEW #####################
-# resource "aws_athena_named_query" "cur_with_org_data" {
-#   name        = "${local.resource_prefix}view_cur_with_org_data"
-#   database    = "optimization_data"
-#   description = "Provides a CUR extended with organization info"
-#   query       = <<EOF
-# CREATE OR REPLACE VIEW cur_with_org_data AS
-# SELECT *
-# FROM (cid_cur.cur cur
-# INNER JOIN  "optimization_data"."organization_data"
-#   ON (cur.line_item_usage_account_id =  "optimization_data"."organization_data".id))
-# EOF
-# }
+resource "aws_athena_named_query" "cur_with_org_data" {
+  name        = "${local.resource_prefix}view cur_with_org_data"
+  database    = "optimization_data"
+  description = "Provides a cur extended with organization info"
+  query       = <<EOF
+CREATE OR REPLACE VIEW cur_with_org_data AS
+SELECT *
+FROM (cid_cur.cur cur
+INNER JOIN "optimization_data"."organization_data"
+  ON ("cur"."line_item_usage_account_id" = "optimization_data"."organization_data"."id"))
+EOF
+}
